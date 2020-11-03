@@ -1,4 +1,4 @@
-![alt text](https://raw.githubusercontent.com/RKStudioTM/ChatMC/master/icons/icon.png)
+
 # BitTrey
 
 **Clone and run for a quick way to see ChatMC in action.**
