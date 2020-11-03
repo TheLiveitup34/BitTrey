@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <title>Application</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+
+    <div class="draw"></div>
+
+    <!-- Error Handling -->
+    <template id="error">
+        <div class="error page">
+            <h1>Error has Occured</h1>
+            <h4 data-err-code></h4>
+            
+            <button data-err-return>Return to prior page?</button>
+        </div>
+    </template>
+
+    <!-- Logged In Pages -->
+
+    <!-- App Chooser -->
+    <template id="gallery" data-prepend="nav">
+        <div class="gallery">
+            <div class="display">
+                <div class="card" data-btn="todo">
+                    <div class="content">
+                        <img width="400px" height="300px" src="./img/todo.jpg">
+                    </div>
+                    <div class="text">
+                        <h1>Todo List</h1>
+                    </div>
+                </div>
+                <div class="card" data-btn="loan">
+                    <div class="content">
+                        <img width="400px" height="300px" src="./img/loan.jpg">
+                    </div>
+                    <div class="text">
+                        <h1>Loan Tracker</h1>
+                    </div>
+                </div>
+                <div class="card" data-btn="notes">
+                    <div class="content">
+                        <img width="400px" height="300px" src="./img/notes.jpg">
+                    </div>
+                    <div class="text">
+                        <h1>Notes</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Todo List -->
+    <template id="todo" data-prepend="nav">
+        <div class="todo">
+            <div class="todo-nav">
+                <ul data-todo-nav>
+                </ul>
+                <form data-todo-create>
+                    <input type="text" name="task" placeholder="Create a project">
+                    <button>+</button>
+                </form>
+                <button data-todo-removeProject style="margin-top: 1em;">Delete Project?</button>
+            </div>
+
+            <div class="todo-display">
+                <div class="todo-header">
+                    <h2 data-todo-title>Create a Project</h2>
+                    <p data-todo-count></p>
+                </div>
+
+                <div class="todo-body">
+                    <ul data-todo-active data-drag-container></ul>
+                    <ul data-todo-finish data-drag-container></ul>
+                    <div class="todo-controls">
+                        <form data-todo-task>
+                            <input type="text" name="task" placeholder="Create a task">
+                            <button>+</button>
+                        </form>
+
+                        <div class="todo-remove" data-todo-remove data-drag-container data-hide-drag>
+                            <h1>Drag to REMOVE</h1>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+        </div>
+    </template>
+
+    <!-- Loan Tracker Main page -->
+    <template id="loan" data-prepend="nav">
+        <div class="loan">
+            <div class="header">
+                <h1>Active Loans</h1>
+            </div>
+            <div class="body">
+                <ul data-loans>
+                </ul>
+                <div class="controller">
+                    <h2>Track Loan</h2>
+                    <form data-loan-add>
+                        <input type="text" name="name" placeholder="Name">
+                        <input type="text" name="ammount" placeholder="Ammount (example 123456)">
+                        <button>Track</button>
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+        <div data-loan-home></div>
+    </template>
+
+
+    <!-- Loan Tracker Loan page -->
+    <template id="loanHome"=>
+        <div class="loan-home">
+            <div class="header">
+                <h1 data-loan-name></h1>
+            </div>
+            <div class="gage">
+                <div class="gage-background"></div>
+                <div class="gage-inner"></div>
+                <div class="gage-meter" data-loan-meter style="transform: rotate(0deg);"></div>
+                <div class="gage-display">
+                    <h2 data-loan-ammount></h2>
+                    <p data-loan-remaining></p>
+                </div>
+            </div>
+            <div class="controller">
+                <button data-loan-pay>Add Payment</button>
+                <button data-loan-remove>Delete Loan</button>
+            </div>
+            <div class="payments">
+                <h3>Payments</h3>
+                <ul data-loan-prior>
+                </ul>
+            </div>
+        </div>
+    </template>
+
+    <!-- Loan Modal -->
+    <template id="loanAdd" data-modal-form>
+        <form data-loan-payment style="justify-content: center; align-items: center; display: flex; flex-direction: column;">
+            <input type="text" name="ammount" placeholder="ammount">
+            <button>Add Payment</button>
+        </form>
+    </template>
+
+    <!-- Notes -->
+    <template id="notes" data-prepend="nav">
+        <div class="notes">
+            <div class="nav">
+                <form data-notes-create>
+                    <input type="text" name="note" placeholder="Create a Note">
+                    <button>+</button>
+                </form>
+                <ul data-notes></ul>
+            </div>
+            <div class="editor">
+                <div class="controller">
+                    <a class="tooltip" data-format="bold"><span class="material-icons">format_bold</span><span class="tooltiptext">Bold</span></a>
+                    <a class="tooltip" data-format="italic"><span class="material-icons">format_italic</span><span class="tooltiptext">Italicize</span></a>
+                    <a class="tooltip" data-format="underline"><span class="material-icons">format_underline</span><span class="tooltiptext">Underline</span></a>
+                    <a class="tooltip" data-format="strikethrough"><span class="material-icons">format_strikethrough</span><span class="tooltiptext">Strikethrough</span></a>
+                    <a class="tooltip" data-format="justifyLeft"><span class="material-icons">format_align_left</span><span class="tooltiptext">Left Align</span></a>
+                    <a class="tooltip" data-format="justifyCenter"><span class="material-icons">format_align_center</span><span class="tooltiptext">Center Align</span></a>
+                    <a class="tooltip" data-format="justifyRight"><span class="material-icons">format_align_right</span><span class="tooltiptext">Right Align</span></a>
+                    <a class="tooltip" data-format="justifyFull"><span class="material-icons">format_align_justify</span><span class="tooltiptext">Justify</span></a>
+                    <a class="tooltip" data-format="insertOrderedList"><span class="material-icons">format_list_numbered</span><span class="tooltiptext">Number List</span></a>
+                    <a class="tooltip" data-format="insertUnorderedList"><span class="material-icons">format_list_bulleted</span><span class="tooltiptext">Bulleted List</span></a>
+                    <a class="btn" data-notes-remove>Delete Note</a>
+                </div>
+                <div class="note" contenteditable="true"><div></div></div>
+            </div>
+        </div>
+    </template>
+
+    <template id="createNote">
+        <center>
+            <h1>Create a Note First!</h1>
+        <p>click anywhere to continue</p>
+        </center>
+    </template>
+
+    <!-- Navigation -->
+    <template id="nav">
+        <header>
+            <nav>
+                <a data-btn="gallery"><h1>BitTrey</h1></a>
+                <a data-btn="loginTokn" class="btn tknnav">Request Login Token</a>
+                <a data-btn="logout">Logout</a>
+            </nav>
+        </header>
+    </template>
+
+    <template id="tknsend">
+      <div style="text-align: center; padding: 2em;">
+        <h1>Token has been Sent</h1>
+        <p>Check your email</p>
+      </div>
+    </template>
+
+    <!-- Modal Setup -->
+    <template id="modal">
+        <div class="modal">
+            <div class="modal-content">
+
+            </div>
+        </div>
+    </template>
+
+    <!-- Logged in Pages End -->
+
+    <!-- Logged out Pages -->
+
+    <!-- Default Homepage Logged Out -->
+    <template id="homepage">
+        <div class="home page">
+            <h1>BitTrey</h1>
+            <a data-btn="login" class="btn">Login</a>
+            <a data-btn="signup" class="btn">Sign Up</a>
+        </div>
+    </template>
+
+    <!-- Login Page -->
+    <template id="login">
+        <div class="login page">
+            <h1>Login</h1>
+            <div class="dialog-box"></div>
+            <form data-pass="login">
+                <input type="text" name="email" placeholder="Email" autocomplete="new-password" autofocus="true">
+                <input type="password" name="pwd" placeholder="Password" autocomplete="new-password">
+                <button class="center">Login</button>
+            </form>
+            <div class="altMethod">
+                <a data-btn="forgotpwd">Forgot Password?</a>
+                <a data-btn="oauthtkn">Use Token Login</a>
+            </div>
+            <a data-btn="homepage">Back to Homepage</a>
+        </div>
+    </template>
+
+    <!-- Forgot Password Page -->
+    <template id="forgotpwd">
+        <div class="page">
+            <h1>Reset Password</h1>
+            <div class="dialog-box"></div>
+            <form data-pass="forgotpassword">
+                <input type="email" name="email" placeholder="Email to reset password" autocomplete="new-password" autofocus="true">
+                <button class="center">Reset Password</button>
+            </form>
+            <a data-btn="login">Back to Login</a>
+        </div>
+    </template>
+
+    <!-- Forgot Password Page -->
+    <template id="chngpwd">
+        <div class="page">
+            <h1>Reset Password</h1>
+            <div class="dialog-box"></div>
+            <form data-pass="resetpassword">
+                <input type="text" name="token" placeholder="Token to reset password" autocomplete="new-password" autofocus="true">
+                <input type="password" name="pwd" placeholder="Password" autocomplete="new-password">
+                <input type="password" name="pwd_con" placeholder="Confirm Password" autocomplete="new-password">
+                <button class="center">Reset Password</button>
+            </form>
+            <a data-btn="login">Back to Login</a>
+        </div>
+    </template>
+
+    <!-- Token Login Page -->
+    <template id="oauthtkn">
+       <div class="page">
+        <h1>Login With Token</h1>
+        <div class="dialog-box"></div>
+        <form data-oauth data-pass="oauthtkn">
+            <div class="inline">
+                <input type="tel" maxlength="1" name="char0" id="char0" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder autofocus="true">
+                <input type="tel" maxlength="1" name="char1" id="char1" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder>
+                <input type="tel" maxlength="1" name="char2" id="char2" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder>
+                <input type="tel" maxlength="1" name="char3" id="char3" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder>
+                <input type="tel" maxlength="1" name="char4" id="char4" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder>
+                <input type="tel" maxlength="1" name="char5" id="char5" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder>
+            </div>
+            <button class="center">Submit</button>
+        </form>
+        <a data-btn="login">Back to Login?</a>
+       </div>
+    </template>
+
+    <!-- Create Account Page -->
+    <template id="signup">
+        <div class="signup page">
+            <h1>Sign Up</h1>
+            <div class="dialog-box"></div>
+            <form data-pass="signup">
+                <input type="text" name="username" placeholder="username" autocomplete="new-password" autofocus="true">
+                <input type="email" name="email" placeholder="email@email.com" autocomplete="new-password">
+                <input type="password" name="pwd" placeholder="Password" autocomplete="new-password">
+                <input type="password" name="pwd_con" placeholder="Confirm Password" autocomplete="new-password">
+
+                <button class="center">Sign Up</button>
+            </form>
+            <a data-btn="homepage">Back to Homepage</a>
+        </div>
+    </template>
+    <!-- Logged out Pages End -->
+
+    <script type="text/javascript">const errMsg = {code: "RRX", msg: null};</script>
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>
