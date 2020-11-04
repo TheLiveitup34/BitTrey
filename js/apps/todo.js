@@ -13,7 +13,7 @@ export default class Todo {
         lastRequest: null
     };
     
-    api;
+    api = null;
 
     constructor(main) {
         this.main = main;
@@ -59,31 +59,71 @@ export default class Todo {
         })
 
 
-        this.render();
+       this.saveAndRender();
 
     }
 
     async setApi() {
-        this.api = await new Validator(this.main, 'getTodo');
+        let api = await new Validator(this.main, 'getTodo');
+        api = api[0];
+        api.todo.forEach(todo => {
+            const localStorage = this.todo.lists.find(list => list.api === todo.todolist_id);
+           
+            if (localStorage == "null" || localStorage == null) {
+                const temp = {id: todo.todolist_id, api: todo.todolist_id,name: todo.todolist_name,todo: []};
+                this.todo.lists.push(temp);
+
+            }
+            
+            
+        }) 
+    
+        if (this.todo.selectedId !== null) {
+            const newTodo = [];
+            const activeList = this.todo.lists.find(list => list.id === this.todo.selectedId);
+            api.items.forEach(item => {
+                
+                const valid  = api.todo.find(todo => todo.todolist_id === item.todolist_id);
+    
+                const localStorage = activeList.todo.find(todo => todo.apid === item.item_id);
+
+                if (valid == null || valid == "null") {
+                    new Validator(this.main, 'removeTodoItem', item.item_id);
+                }
+    
+
+      
+                if (localStorage == null || localStorage == "null") {
+                    
+                    const temp = {id: item.item_id,api: item.todolist_id,apid:item.item_id, name: item.item_name,active: item.item_content};
+                    
+                    if (item.todolist_id == activeList.api) {
+                        activeList.todo.push(temp);
+                    }
+
+                } else {
+                    let active = (item.item_content == "True") ? true : false;
+                    localStorage.active = active;
+                }
+
+        
+    
+            })
+        }
+
     }
 
     
-    saveAndRender() {
+    async saveAndRender() {
 
-        this.setApi();
-        this.save();
+        await this.save();
         this.render();
 
     }
 
-    save() {
-
-        this.intigrateApi();
+    async save() {
+        await this.setApi();
         new Storage('set', 'todo', this.todo);
-    }
-
-    intigrateApi() {
-
     }
 
     render() {
@@ -203,7 +243,7 @@ export default class Todo {
         this.saveAndRender();
     }
 
-    createTask() {
+    async createTask() {
         const form = document.querySelector('[data-todo-task]');
         const input = document.querySelector('[data-todo-task] input');
         let data = new FormData(form);
@@ -212,7 +252,8 @@ export default class Todo {
        
         const selectedList = this.todo.lists.find(list => list.id === this.todo.selectedId);
         const temp = {id: Date.now().toString(),api: selectedList.api,apid:null, name: data.get('task'),active: true}
-        new Validator(this.main, 'addTodoItem', temp);
+        const apid = await new Validator(this.main, 'addTodoItem', temp);
+        temp.apid = apid;
         input.value = "";
         selectedList.todo.push(temp);
         this.save();
@@ -233,7 +274,7 @@ export default class Todo {
 
 
 
-    dragEnd(e, child) {
+    async dragEnd(e, child) {
         const selectedList = this.todo.lists.find(list => list.id === this.todo.selectedId);
         const parent = e.target.parentNode;
         if (parent.hasAttribute('data-todo-remove')) {
@@ -241,7 +282,7 @@ export default class Todo {
             this.todo.removed.push(selectedItem);
             selectedList.todo = selectedList.todo.filter(task => task.id !== child.id);
             child.remove();
-            new Validator(this.main, 'removeTodoItem', selectedItem.apid);
+            await new Validator(this.main, 'removeTodoItem', selectedItem.apid);
 
             this.save();
             this.main.doEvent('todo');
@@ -261,6 +302,9 @@ export default class Todo {
             });
             selectedList.todo = temp;
 
+            await new Validator(this.main, 'removeTodoItem', selectedItem.apid);
+            const apid = await new Validator(this.main, 'addTodoItem', selectedItem);
+            selectedItem.apid = apid;
             this.save();
             this.main.doEvent('todo');
 
@@ -279,7 +323,9 @@ export default class Todo {
                 temp.push(selectedItem);
             });
             selectedList.todo = temp;
-
+            await new Validator(this.main, 'removeTodoItem', selectedItem.apid);
+            const apid = await new Validator(this.main, 'addTodoItem', selectedItem);
+            selectedItem.apid = apid;
             this.save();
             this.main.doEvent('todo');
         }

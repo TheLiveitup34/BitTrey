@@ -1,5 +1,6 @@
 import Storage from '../storage.js'
 import Modal from '../modal.js'
+import Validator from '../validator.js'
 
 export default class Notes {
 
@@ -60,14 +61,16 @@ export default class Notes {
                 this.saveAndRender();
             }
         })
-        this.render();
+        this.saveAndRender();
     }
 
-    createNote() {
+    async createNote() {
         const input = document.querySelector('[data-notes-create] input');
 
         if (input.value == null || input.value == "") return;
-        let note = {id: Date.now().toString(), name: input.value, note: ""}
+        const api = await new Validator(this.main, 'addNotes', {name: input.value, note: ""})
+        console.log(api);
+        let note = {id: Date.now().toString(), api: api, name: input.value, note: ""}
         this.notes.selectedId = note.id;
 
         input.value = "";
@@ -79,9 +82,12 @@ export default class Notes {
     }
 
     removeNote() {
+        const noteid  = this.notes.notes.find(note => note.id == this.notes.selectedId).api; 
         this.notes.notes = this.notes.notes.filter(note => note.id !== this.notes.selectedId);
         this.notes.selectedId = null;
         this.textarea.innerText = "";
+
+        new Validator(this.main, 'removeNotes', noteid);
         this.saveAndRender();
     }
 
@@ -103,24 +109,14 @@ export default class Notes {
 
         this.saveInterval = setTimeout(() => {
             selectedNote.note = this.textarea.innerText;
+            new Validator(this.main, 'updateNotes', {name: selectedNote.name, note: selectedNote.note, api: selectedNote.api})
             this.save();
         }, 500);
 
-        if (this.textarea.childNodes.length <= 1 && this.textarea.classList.contains('coding')) {
-            if (this.textarea.childNodes[0].tagName.toLowerCase() !== 'div') {
-                if (e.key.length > 1) {
-                    this.textarea.innerHTML = "<div></div>";
-                } else {
-                    
-                    this.textarea.innerHTML = `<div>${e.key}</div>`;
-                }
-            }
-        }
-
     }
 
-    saveAndRender() {
-        this.save();
+    async saveAndRender() {
+        await this.save();
         this.render();
     }
 
@@ -158,8 +154,22 @@ export default class Notes {
     }
 
 
-    save() {
-        
+    async addApi() {
+        const api = await new Validator(this.main, 'getNotes');
+        if (api.length > 0) {
+            
+        api.forEach(note => {
+            const localStorage = this.notes.notes.find(notes => notes.api == note.note_id);
+            if (localStorage == null || localStorage == "null") {
+                const temp = {id: note.note_id, api: note.note_id, name: note.title, note: note.note_content};
+                this.notes.notes.push(temp);
+            }
+        })
+        }
+    }
+
+    async save() {
+        await this.addApi();
         new Storage('set', 'notes', this.notes);
     }
 

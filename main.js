@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, Menu } = require('electron')
 
 function createWindow () {
   // Create the browser window.
@@ -14,7 +14,6 @@ function createWindow () {
   win.loadFile('index.html')
 
 
-  win.webContents.openDevTools()
 }
 
 app.whenReady().then(createWindow)
@@ -25,6 +24,8 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+
+Menu.setApplicationMenu(null);
 
 app.on('activate', () => {
 

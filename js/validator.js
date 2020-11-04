@@ -61,7 +61,30 @@ export default class Validator {
                 return this.addTodoItem(data);
 
             break;
-
+            case "getNotes":
+                return this.getNotes();
+            break;
+            case "addNotes":
+                return this.addNotes(data)
+            break;
+            case "updateNotes":
+                this.updateNotes(data);
+            break;
+            case "removeNotes":
+                this.removeNotes(data);
+            break;
+            case "getLoan":
+                return this.getLoan();
+            break;
+            case "addLoan":
+                return this.addLoan(data);
+            break;
+            case "removeLoan":
+                this.removeLoan(data);
+            break;
+            case "addPayment":
+                this.addPayment(data);
+            break;
             case "err":
                 // Send Errors to Database to be patched or debugged
                 return;
@@ -76,6 +99,166 @@ export default class Validator {
         return;
     }
 
+
+
+    async getNotes() {
+        let c = new Cookies().getCookie('_SSID');
+        let s = new Storage().getStorage('user');
+        if (c == null || undefined) return false;
+        if (s == null) return false;
+
+        const res = await new Api('Get/notes', {
+            uuid: s.uuid,
+            session_id: c,
+            session_token: s.session_token
+          })
+
+          if (res.online == false) return null;
+          if (this.main.ClientOnline) return null;
+
+          if (res.success) { return res.response}
+          return [];
+    }
+
+    async addNotes(data) {
+        let c = new Cookies().getCookie('_SSID');
+        let s = new Storage().getStorage('user');
+        if (c == null || undefined) return false;
+        if (s == null) return false;
+
+        const res = await new Api('add/Notes', {
+            noteTitle: data.name,
+            noteContent: data.note,
+            uuid: s.uuid,
+            session_id: c,
+            session_token: s.session_token
+          })
+
+          if (res.online == false) return null;
+          if (this.main.ClientOnline) return null;
+
+          if (res.success) { return res.response.noteid}
+          return null;
+    }
+
+    async updateNotes(data) {
+        let c = new Cookies().getCookie('_SSID');
+        let s = new Storage().getStorage('user');
+        if (c == null || undefined) return false;
+        if (s == null) return false;
+
+        const res = await new Api('Update/notes', {
+            noteTitle: data.name,
+            noteContent: data.note,
+            noteID: data.api,
+            uuid: s.uuid,
+            session_id: c,
+            session_token: s.session_token
+          })
+
+          if (res.online == false) return null;
+          if (this.main.ClientOnline) return null;
+
+          if (res.success) { return res.response}
+    }
+
+    async removeNotes(data) {
+        let c = new Cookies().getCookie('_SSID');
+        let s = new Storage().getStorage('user');
+        if (c == null || undefined) return false;
+        if (s == null) return false;
+
+        const res = await new Api('Remove/note', {
+            noteID: data,
+            uuid: s.uuid,
+            session_id: c,
+            session_token: s.session_token
+          })
+
+          if (res.online == false) return null;
+          if (this.main.ClientOnline) return null;
+
+          if (res.success) { return res.response}
+    }
+    
+    async getLoan() {
+        let c = new Cookies().getCookie('_SSID');
+        let s = new Storage().getStorage('user');
+        if (c == null || undefined) return false;
+        if (s == null) return false;
+
+        const res = await new Api('Get/loans', {
+            uuid: s.uuid,
+            session_id: c,
+            session_token: s.session_token
+          })
+
+          if (res.online == false) return null;
+          if (this.main.ClientOnline) return null;
+
+          if (res.success) { return res.response}
+          return null
+    }
+
+    async addLoan(data) {
+        let c = new Cookies().getCookie('_SSID');
+        let s = new Storage().getStorage('user');
+        if (c == null || undefined) return false;
+        if (s == null) return false;
+
+        const res = await new Api('add/loan', {
+            name: data.name,
+            loanAmount: data.ammount,
+            uuid: s.uuid,
+            session_id: c,
+            session_token: s.session_token
+          })
+
+          if (res.online == false) return null;
+          if (this.main.ClientOnline) return null;
+
+          if (res.success) { return res.response.loanID}
+    }
+
+
+    async removeLoan(data) {
+        let c = new Cookies().getCookie('_SSID');
+        let s = new Storage().getStorage('user');
+        if (c == null || undefined) return false;
+        if (s == null) return false;
+
+        const res = await new Api('Remove/loan', {
+            loan_id: data,
+            uuid: s.uuid,
+            session_id: c,
+            session_token: s.session_token
+          })
+
+          if (res.online == false) return null;
+          if (this.main.ClientOnline) return null;
+
+          if (res.success) { return res.response}
+    }
+
+    async addPayment(data) {
+        let c = new Cookies().getCookie('_SSID');
+        let s = new Storage().getStorage('user');
+        if (c == null || undefined) return false;
+        if (s == null) return false;
+
+        const res = await new Api('add/loanPayment', {
+            payment_amount: data.ammount,
+            loan_id: data.api,
+            uuid: s.uuid,
+            session_id: c,
+            session_token: s.session_token
+          })
+
+          if (res.online == false) return null;
+          if (this.main.ClientOnline) return null;
+
+          if (res.success) { return res.response}
+    }
 
 
     async getTodo() {
@@ -130,7 +313,6 @@ export default class Validator {
             session_id: c,
             session_token: s.session_token
           })
-
           if (res.online == false) return null;
           if (this.main.ClientOnline) return null;
 
@@ -173,11 +355,8 @@ export default class Validator {
 
           if (res.online == false) return null;
           if (this.main.ClientOnline) return null;
-
-          if (res.success) { return true}
-
-
-    }
+          if (res.success) { return res.response.listID}
+    }   
 
 
 
@@ -539,7 +718,6 @@ export default class Validator {
         s.session_token = res.response.session_token;
 
         new Storage('set', 'user', s);
-
         return true;
 
     }

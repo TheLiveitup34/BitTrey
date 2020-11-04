@@ -1,5 +1,6 @@
 import Storage from '../storage.js'
 import Modal from '../modal.js'
+import Validator from '../validator.js';
 export default class Loan {
     defaultLoan = {
         loans: [],
@@ -35,19 +36,19 @@ export default class Loan {
             this.createLoan();
         })
 
-        this.render();
+        this.saveAndRender();
 
     }
 
 
-    createLoan() {
+    async createLoan() {
         const form = document.querySelector('[data-loan-add]');
         const data = new FormData(form);
 
         if (data.get('name') == "" && data.get('ammount') == "") return;
         if (isNaN(data.get('ammount'))) return;
-
-        const temp = {id: Date.now().toString(), name: data.get('name'), ammount: data.get('ammount'), payments: []};
+        const api = await new Validator(this.main, 'addLoan', {name: data.get('name'), ammount: data.get('ammount')});
+        const temp = {id: Date.now().toString(), api: api, name: data.get('name'), ammount: data.get('ammount'), payments: []};
 
         this.data.selectedId = temp.id;
         this.data.loans.push(temp);
@@ -59,14 +60,56 @@ export default class Loan {
     }
 
 
-    saveAndRender() {
+    async saveAndRender() {
 
-        this.save();
+        await this.save();
         this.render();
 
     }
 
-    save() {
+    async addApi() {
+        let api = await new Validator(this.main, 'getLoan');
+        if (api !== null) {
+
+            api.loan.forEach(loan => {
+                const localStorage = this.data.loans.find(loans => loans.api == loan.loan_id);
+                if (localStorage == null || localStorage == "null" ) {
+                    const temp = {id: loan.loan_id, api: loan.loan_id, name: loan.name, ammount: parseInt(loan.loan_amount), payments: []};
+                    this.data.loans.push(temp);
+                }
+
+            })
+
+            if (this.data.selectedId !== null) {
+                
+            const SelectedLoan = this.data.loans.find(loan => loan.id == this.data.selectedId);
+            let payments  = api.payments.find(payment => payment.loan_id == this.data.selectedId);
+
+            if (typeof payments == "object") {
+                let temp = [];
+                temp.push(payments);
+                payments = temp;
+            }
+
+            if (payments == null || payments == "null") return;
+
+                if (payments !== null || payments !== "null") {
+                    payments.forEach(payment =>  {
+                        const payments = [];
+                        const temp  = {id: payment.payment_id, ammount: payment.payment_amount, date: payment.payment_date};
+                        payments.push(temp);
+                       if (SelectedLoan.id == this.data.selectedId) {
+                        SelectedLoan.payments = payments;
+                       }
+                    })
+                }
+            }
+
+        }
+    }
+
+    async save() {
+        await this.addApi();
         new Storage('set', 'loans', this.data);
     }
 
@@ -148,9 +191,10 @@ export default class Loan {
                 let data = new FormData(form);
                 if (data.get('ammount') == "") return;
                 if (isNaN(data.get('ammount'))) return;
+                new Validator(this.main, 'addPayment', {api: SelectedLoan.api, ammount: data.get('ammount')})
                 if (parseInt(data.get('ammount')) > parseInt(SelectedLoan.ammount)) return;
-
-                const temp  = {id: Date.now().toString(), ammount: data.get('ammount'), date: Date()};
+                let date  = new Date();
+                const temp  = {id: Date.now().toString(), ammount: data.get('ammount'), date: `${date.getMonth()}/${date.getDay()}/${date.getFullYear()}`};
                 SelectedLoan.payments.push(temp);
                 document.querySelector('.modal').remove();
                 this.saveAndRender();
@@ -160,6 +204,8 @@ export default class Loan {
 
         template.querySelector('[data-loan-remove]').addEventListener('click', e => {
             e.preventDefault();
+            const api = this.data.loans.find(loan => loan.id == this.data.selectedId).api;
+            new Validator(this.main, 'removeLoan', api);
             this.data.loans = this.data.loans.filter(loan => loan.id  !== this.data.selectedId);
             this.data.selectedId = null;
             this.clearElement(this.home);
@@ -197,6 +243,16 @@ export default class Loan {
         // appending the letter to precised val. 
         return sVal + s[sNum]; 
     }
+
+    convertToArray(obj) {
+        let arr = [];
+        obj = Object.entries(obj);
+        obj.forEach(([keys,item]) => {
+            arr.push(item);
+        })
+        return arr;
+    }
+
 
     clearElement(elm) {
         while(elm.firstChild) {

@@ -133,7 +133,7 @@ class Main {
                     temp = document.importNode(document.getElementById(this.defaultPage).content, true);
 
                     // if Session is invalid then removes storage
-                    if (new Storage().getStorage('user') !== null) { new Storage('remove', 'user');}
+                    if (new Storage().getStorage('user') !== null) { new Storage('remove', 'user');new Storage('remove', 'notes');new Storage('remove', 'todo');new Storage('remove', 'loans');}
 
                     // if Cookie persists removes it on invalid session
                     if (new Cookies().getCookie('_SSID') !== null) {new Cookies().setCookie('_SSID', 1, '-7')}
