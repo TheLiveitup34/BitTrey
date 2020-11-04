@@ -1,0 +1,5 @@
+fastapi
+sqlalchemy
+flask_bcrypt
+uuid
+uvicorn
