@@ -64,3 +64,28 @@ Note: If you're using Linux Bash for Windows, [see this guide](https://www.howto
 
 ELECTRON
 https://electronjs.org/
+
+## api
+
+HOW TO USE
+
+```bash
+# make sure you have a python 3.8.6 installed or else it may not work
+# install the requirements from the txt file
+pip install -r requirements
+# open up the main.py file with your favorite text editor and uncomment these line of code
+
+uncomment if you need to run it on a different port 
+also doesnt allow reload on modification of a file
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=69)
+    
+# should look like the example above
+# Run the app
+python main.py 
+```
+## Credits
+https://fastapi.tiangolo.com/
+
+
+
