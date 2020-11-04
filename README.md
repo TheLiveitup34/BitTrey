@@ -75,8 +75,6 @@ HOW TO USE
 pip install -r requirements.txt
 # open up the main.py file with your favorite text editor and uncomment these line of code
 
-uncomment if you need to run it on a different port 
-also doesnt allow reload on modification of a file
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=69)
     
