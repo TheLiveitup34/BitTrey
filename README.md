@@ -1,3 +1,4 @@
+# want to check it out well go to https://www.bittrey.com/ and try it out 
 
 # BitTrey
 
@@ -9,7 +10,7 @@ npm install
 npm start
 ```
 
-Authors ReChecks and  TheLiveitup34
+##Authors ReChecks and  TheLiveitup34
 
 
 **Use this app along with the [Electron API Demos](http://electron.atom.io/#get-started) app for API code examples to help you get started.**
