@@ -72,7 +72,7 @@ HOW TO USE
 ```bash
 # make sure you have a python 3.8.6 installed or else it may not work
 # install the requirements from the txt file
-pip install -r requirements
+pip install -r requirements.txt
 # open up the main.py file with your favorite text editor and uncomment these line of code
 
 uncomment if you need to run it on a different port 
