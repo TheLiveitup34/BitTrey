@@ -1,5 +1,5 @@
 # want to check it out well go to https://www.bittrey.com/ and try it out 
-** website is no longer up and running the app can still be deployed locally
+** website is no longer up and running, the app can still be deployed locally
 
 # BitTrey
 
