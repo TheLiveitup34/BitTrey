@@ -1,5 +1,5 @@
 fastapi==0.112.1
 sqlalchemy==1.4.53
-flask_bcrypt
+flask_bcrypt==0.7.1
 uuid
-uvicorn
+uvicorn==0.30.6
