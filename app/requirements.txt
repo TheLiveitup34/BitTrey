@@ -1,5 +1,5 @@
-fastapi
-sqlalchemy
+fastapi=0.112.1
+sqlalchemy==1.4.53
 flask_bcrypt
 uuid
 uvicorn
